@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:soapui-project id="0d46b9d0-a571-4804-a6d6-3e4c7715a9bc" activeEnvironment="Default" name="REST Project 2" soapui-version="5.5.0" xmlns:con="http://eviware.com/soapui/config"><con:settings/><con:interface xsi:type="con:RestService" id="ef35d4ef-bdb3-438a-aa3f-52d0e5fd7b82" wadlVersion="http://wadl.dev.java.net/2009/02" name="http://petstore.swagger.io" type="rest" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings/><con:definitionCache/><con:endpoints><con:endpoint>http://petstore.swagger.io</con:endpoint></con:endpoints><con:resource name="Pet" path="/v2/pet" id="f4e6b5aa-7cde-471e-add5-47e8d4110582"><con:settings/><con:parameters/><con:method name="Pet 1" id="cfd42d1f-ec0c-451a-98e6-e0e5878278d6" method="POST"><con:settings/><con:parameters/><con:request name="Request 1" id="9ce3c24e-f18c-4067-a96e-ece380e7466e" mediaType="application/json" postQueryString="false"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>http://petstore.swagger.io</con:endpoint><con:request>{
+  "id": 0,
+  "category": {
+    "id": 0,
+    "name": "string"
+  },
+  "name": "doggie",
+  "photoUrls": [
+    "string"
+  ],
+  "tags": [
+    {
+      "id": 0,
+      "name": "string"
+    }
+  ],
+  "status": "available"
+}</con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters/></con:request></con:method></con:resource></con:interface><con:testSuite id="31ad430a-4b9a-4667-81a4-9d405f80f724" name="PetStore"><con:settings/><con:runType>SEQUENTIAL</con:runType><con:testCase id="77f62b6b-c896-4652-b552-04ae26eb22dc" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="AddPetUsingGroovy" searchProperties="true"><con:settings/><con:testStep type="restrequest" name="AddPet" id="b00d1c09-09c9-4859-8906-eb19add23db3"><con:settings/><con:config service="http://petstore.swagger.io" resourcePath="/v2/pet" methodName="Pet 1" xsi:type="con:RestRequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:restRequest name="Pet 1 - Request 1" id="9ce3c24e-f18c-4067-a96e-ece380e7466e" mediaType="application/json" postQueryString="false"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>http://petstore.swagger.io</con:endpoint><con:request>{"category":{"id":0,"name":"string"},"id":"1010","name":"jombie","photoUrls":["string"],"status":"available","tags":[{"id":0,"name":"string"}]}</con:request><con:originalUri>http://petstore.swagger.io/v2/pet</con:originalUri><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters/></con:restRequest></con:config></con:testStep><con:testStep type="groovy" name="Groovy Script" id="515eb836-469e-4c3c-9785-c15d1e37b7f6"><con:settings/><con:config><script>import groovy.json.JsonSlurper
+import groovy.json.JsonOutput
+import groovy.json.JsonBuilder
+
+// Loading Test case properties id, name
+def input_id = context.expand('${#TestCase#id}')
+def input_name = context.expand('${#TestCase#name}')
+
+
+//Getting Curretn test case, Test suite name
+//def StepName = context.getCurrentStep().name
+def CaseName = context.getTestCase().name
+def SuiteName = context.getTestCase().getTestSuite().name
+
+// Get the request json and store it in "req" variable. it will stored as string
+def req= testRunner.testCase.getTestStepByName('AddPet').getPropertyValue('Request')
+
+// creating JsonSlurper Object and Parsing the "req" into json 
+def jsonSlurper = new groovy.json.JsonSlurper()
+def reqAsJson = jsonSlurper.parseText(req)
+
+// modifing the id and name nodes in the request json
+reqAsJson.id = input_id
+reqAsJson.name = input_name 
+
+// converting the json into string to store into request property
+def jsonReqAsString = JsonOutput.toJson(reqAsJson)
+
+
+// Set the request property value (over riding with modified json
+ 
+testRunner.testCase.getTestStepByName('AddPet').setPropertyValue('Request',jsonReqAsString)
+
+
+// Run the AddPet Step
+
+testRunner.testCase.testSuite.project.testSuites[SuiteName].testCases[CaseName].testSteps["AddPet"].run(testRunner, context)
+
+// Store the Response 
+
+def res= testRunner.testCase.getTestStepByName('AddPet').getPropertyValue('Response')
+
+// parsing the response as json
+def ResAsJson = jsonSlurper.parseText(res)
+
+//get id and name values from response
+
+def result_id = ResAsJson.id
+def result_name = ResAsJson.name
+log.info(result_id)
+log.info(result_name)</script></con:config></con:testStep><con:testStep type="groovy" name="Groovy Script2" id="fd7ba791-e881-477d-9167-2d0047cfa679"><con:settings/><con:config><script>def paulMap = [
+    'name' : 'Paul',
+    'age' : 35,
+    'address' : '123 Main St',
+    'list' : [1,2,3]
+  ];
+ 
+  // Access with key
+  log.info("Name " + paulMap['name']);
+  log.info("Age " + paulMap.get('age'));
+  log.info("List Item " + paulMap['list'][1]);
+ 
+  // Add key value
+  paulMap.put('city', 'Pittsburgh');
+ 
+  // Check for key
+  log.info("Has City " + paulMap.containsKey('city'));
+ 
+  // Size
+  log.info("Size " + paulMap.size());
+
+
+
+
+</script></con:config></con:testStep><con:properties><con:property><con:name>id</con:name><con:value>1010</con:value></con:property><con:property><con:name>name</con:name><con:value>jombie</con:value></con:property><con:property><con:name>Result_id</con:name><con:value/></con:property><con:property><con:name>Result_name</con:name><con:value/></con:property></con:properties></con:testCase><con:properties/></con:testSuite><con:properties/><con:wssContainer/><con:oAuth2ProfileContainer/><con:oAuth1ProfileContainer/></con:soapui-project>
